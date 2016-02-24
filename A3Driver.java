@@ -39,7 +39,7 @@ public class A3Driver {
 		"tx", "nm", "va", "az", "ak"
 	};
 	static void invalidTran(int line){
-		System.out.format("Invalid transaction at line %d", line);
+		System.out.format("Invalid transaction at line %d\n", line);
 	}
 	
 	//test to see if string only contains characters from alphabet
@@ -69,12 +69,12 @@ public class A3Driver {
 	//a float or integer
 	static boolean goodAmount(String prospect){
 		if(prospect.contains(".")){
-			String [] checkdec = prospect.split(".");
+			String [] checkdec = prospect.split("[.]");
 			if(checkdec.length > 2){
 				return false;
 			}
 			for(int i = 0; i < checkdec.length; i++){
-				if(!isInteger(checkdec[i])){
+				if(!isInteger(checkdec[i]) ){
 					return false;
 				}
 			}
@@ -90,7 +90,7 @@ public class A3Driver {
 	{
 		for(int i = 0; i < shoppingCart.size(); i++)
 		{
-			int compare = shoppingCart.get(i).getName().compareTo(item.getName());
+			int compare = shoppingCart.get(i).getName().toLowerCase().compareTo(item.getName().toLowerCase());
 			if(compare == 0 || compare >= 1)
 			{
 				shoppingCart.add(i, item);
@@ -233,11 +233,7 @@ public class A3Driver {
 			int found = 0;
 			while(spot >= 0)
 			{
-				if(cart.get(spot).getName().compareTo(item) <= -1)
-				{
-					break;
-				}
-				else if(cart.get(spot).getName() == item)
+				if(cart.get(spot).getName() == item)
 				{
 					found += cart.get(spot).getQuantity();
 				}
@@ -260,11 +256,7 @@ public class A3Driver {
 			int deleted = 0;
 			while(spot >= 0)
 			{
-				if(cart.get(spot).getName().compareTo(item) <= -1)
-				{
-					break;
-				}
-				else if(cart.get(spot).getName().equals(item))
+				if(cart.get(spot).getName().equals(item))
 				{
 					cart.remove(spot);
 					deleted++;
@@ -289,14 +281,14 @@ public class A3Driver {
 			int quant = Integer.parseInt(tran[2]);
 			while(temp < spot)
 			{
-				if(cart.get(spot).getName() == item)
+				if(cart.get(temp).getName().equals(item))
 				{
-					cart.get(spot).setQuantity(quant);
+					cart.get(temp).setQuantity(quant);
 				}
 				temp++;
 				break;
 			}
-			System.out.println("Searched & Updated " + item + " to "+ quant + "." );
+			System.out.println("Searched & Updated quantity of " + item + " to "+ quant + "." );
 		}
 		else
 		{
@@ -333,7 +325,7 @@ public class A3Driver {
 		// into separate words that will be parsed
 		String[] tokens = tran.split(" +");
 		if(!isMember(operations, tokens[0])){
-			return;	
+			invalidTran(line);	
 		}
 		if(tokens[0].equals("insert")){
 			doInsert(tokens, line, shoppingCart);
