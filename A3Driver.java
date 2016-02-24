@@ -9,27 +9,34 @@ import java.util.*;
 public class A3Driver {
 	
 	//array of operation strings to use when parsing input
+	static String [] states = new String[] {
+		"ak", "al", "ar", "az", "ca", "co", "ct", "dc", "de", 
+		"fl", "ga", "hi", "ia", "id", "il", "in", "ks", "ky", 
+		"la", "ma", "md", "me", "mi", "mn", "mo", "ms", "mt", 
+		"nc", "nd", "ne", "nh", "nj", "nm", "nv", "ny", "oh", 
+		"ok", "or", "pa", "ri", "sc", "sd", "tn", "tx", "ut", 
+		"va", "vt", "wa", "wi", "wv", "wy"};
+	
 	static String [] operations = new String []{
 		"insert", "search", "delete", "update",
 		"print"
 	};
 	
-	//array of category strings to use when parsing input
 	static String [] category = new String []{
 		"groceries", "electronics", "clothing"	
 	};
 	
 	static String [] perish = new String []{
-			"P", "NP"
+			"p", "np"
 	};
 	
 	static String [] fragility = new String []{
-			"F", "NF"
+			"f", "nf"
 	};
 	//array of the states that have no sales tax that
 	//is used when parsing input
 	static String [] taxless = new String []{
-		"TX", "NM", "VA", "AZ", "AK"
+		"tx", "nm", "va", "az", "ak"
 	};
 	static void invalidTran(int line){
 		System.out.format("Invalid transaction at line %d", line);
@@ -37,12 +44,12 @@ public class A3Driver {
 	
 	//test to see if string only contains characters from alphabet
 	static boolean isAlpha(String name) {
-	    return name.matches("[a-zA-Z]+");
+	    return name.matches("[a-zA-Z0-9]+");
 	}
 	
 	//tests to see if characters resolve to an integer
 	public static boolean isInteger(String str) {
-	    if (str == null) {
+		if (str == null) {
 	        return false;
 	    }
 	    int length = str.length();
@@ -78,6 +85,28 @@ public class A3Driver {
 			}else return false;
 		}
 	}
+	//Puts item in correct spot in ArrayList dependent on Alpha order based on Item Name
+	static void sortObjectIn(Item item, ArrayList<Item> shoppingCart)
+	{
+		for(int i = 0; i < shoppingCart.size(); i++)
+		{
+			int compare = shoppingCart.get(i).getName().compareTo(item.getName());
+			if(compare == 0 || compare >= 1)
+			{
+				shoppingCart.add(i, item);
+				//System.out.println("I am putting in "+ item.getName());
+				return;
+			}
+			else if(shoppingCart.size()-1 == i)
+			{
+				shoppingCart.add(item);
+				//System.out.println("I am putting in "+ item.getName());
+				return;
+			}
+		}
+		shoppingCart.add(item);
+		//System.out.println("I am putting in "+ item.getName());
+	}
 	//method that handles insert operation
 	static void doInsert(String [] tran, int line,  ArrayList<Item> shoppingCart){
 		if(!isMember(category, tran[1])){
@@ -86,6 +115,7 @@ public class A3Driver {
 		}
 		float initAmount;
 		int initQuan, initWeight;
+		Item item;
 		
 		
 		if(tran[1].equals("groceries")){
@@ -117,7 +147,8 @@ public class A3Driver {
 				invalidTran(line);
 				return;
 			}
-			shoppingCart.add(new Grocery(tran[2], initAmount, initQuan, initWeight, tran[6]));
+			item = new Grocery(tran[2], initAmount, initQuan, initWeight, tran[6].toUpperCase());
+			sortObjectIn(item, shoppingCart);
 			return;
 			
 		}else if(tran[1].equals("electronics")){
@@ -125,16 +156,19 @@ public class A3Driver {
 			//valid form for electronics
 			if(tran.length != 8){
 				invalidTran(line);
+				
 				return;
 			}
 			//makes sure the third token is a name
 			if(!isAlpha(tran[2])){
 				invalidTran(line);
+				
 				return;
 			}
 			//tests if 4th token is a float or integer
 			if(!goodAmount(tran[3])){
 				invalidTran(line);
+				
 				return;
 			}
 			initAmount = Float.parseFloat(tran[3]);
@@ -152,11 +186,12 @@ public class A3Driver {
 				return;
 			}
 			//test if 8th token could be a state
-			if(!isAlpha(tran[7])){
+			if(!isAlpha(tran[7]) && !isMember(states, tran[7])){
 				invalidTran(line);
 				return;
 			}
-			shoppingCart.add(new Electronics(tran[2], initAmount, initQuan, initWeight, tran[6], tran[7]));
+			item = new Electronics(tran[2], initAmount, initQuan, initWeight, tran[6].toUpperCase(), tran[7].toUpperCase());
+			sortObjectIn(item, shoppingCart);
 			return;
 			
 		}else if(tran[1].equals("clothing")){
@@ -183,71 +218,110 @@ public class A3Driver {
 			}
 			initQuan = Integer.parseInt(tran[4]);
 			initWeight = Integer.parseInt(tran[5]);
-			shoppingCart.add(new Clothing(tran[2], initAmount, initQuan, initWeight));
+			item = new Clothing(tran[2], initAmount, initQuan, initWeight);
+			sortObjectIn(item, shoppingCart);
 			return;
 		}
 	}
 	
 	//method that handles insert operation
-	static void doSearch(String [] tran, ArrayList<Item> cart){
-		int spot = cart.size()-1;
-		String item = tran[1];
-		int found = 0;
-		while(spot >= 0)
+	static void doSearch(String [] tran, int line, ArrayList<Item> cart){
+		if(tran.length == 2 && isAlpha(tran[1]))
 		{
-			if(cart.get(spot).getName() == item)
+			int spot = cart.size()-1;
+			String item = tran[1];
+			int found = 0;
+			while(spot >= 0)
 			{
-				found++;
+				if(cart.get(spot).getName().compareTo(item) <= -1)
+				{
+					break;
+				}
+				else if(cart.get(spot).getName() == item)
+				{
+					found += cart.get(spot).getQuantity();
+				}
+					spot--;
 			}
-				spot--;
+			System.out.println("Searched & Found " + found + " many occurances of " + item + "." );
 		}
-		System.out.println("Searched & Found " + found + " many occurances of " + item + "." );
+		else
+		{
+			invalidTran(line);
+		}
 	}
 	
 	//method that handles insert operation
-	static void doDelete(String [] tran, ArrayList<Item> cart){
-		int spot = cart.size()-1;
-		String item = tran[1];
-		int deleted = 0;
-		while(spot >= 0)
+	static void doDelete(String [] tran, int line, ArrayList<Item> cart){
+		if(tran.length == 2 && isAlpha(tran[1]))
 		{
-			if(cart.get(spot).getName() == item)
+			int spot = cart.size()-1;
+			String item = tran[1];
+			int deleted = 0;
+			while(spot >= 0)
 			{
-				cart.remove(spot);
-				deleted++;
+				if(cart.get(spot).getName().compareTo(item) <= -1)
+				{
+					break;
+				}
+				else if(cart.get(spot).getName().equals(item))
+				{
+					cart.remove(spot);
+					deleted++;
+				}
+					spot--;
 			}
-				spot--;
+			System.out.println("Searched & deleted " + deleted + " many occurances of " + item + "." );
 		}
-		System.out.println("Searched & Found " + deleted + " many occurances of " + item + "." );
+		else
+		{
+			invalidTran(line);
+		}
 	}
 	
 	//method that handles insert operation
-	static void doUpdate(String [] tran, ArrayList<Item> cart){
-		int spot = cart.size();
-		int temp = 0;
-		String item = tran[1];
-		int quant = Integer.parseInt(tran[2]);
-		while(temp < spot)
+	static void doUpdate(String [] tran, int line, ArrayList<Item> cart){
+		if(tran.length == 3 && isAlpha(tran[1]) && isInteger(tran[2]))
 		{
-			if(cart.get(spot).getName() == item)
+			int spot = cart.size();
+			int temp = 0;
+			String item = tran[1];
+			int quant = Integer.parseInt(tran[2]);
+			while(temp < spot)
 			{
-				cart.get(spot).setQuantity(quant);
+				if(cart.get(spot).getName() == item)
+				{
+					cart.get(spot).setQuantity(quant);
+				}
+				temp++;
+				break;
 			}
-			temp++;
-			break;
+			System.out.println("Searched & Updated " + item + " to "+ quant + "." );
 		}
-		System.out.println("Searched & Updated " + item + " to "+ quant + "." );
+		else
+		{
+			invalidTran(line);
+		}
 	}
 	
 	//method that handles insert operation
-	static void doPrint(String [] tran, ArrayList<Item> cart){
-		
+	static void doPrint(String [] tran, int line, ArrayList<Item> cart){
+		if(tran.length == 1)
+		{
+			double cartTotal = 0;
+			for(Item item : cart)
+			{
+				cartTotal+= item.calculatePrice();
+				item.printItemAttributes();
+			}
+			System.out.printf("The total for the shopping cart, including tax and shipping costs, is $%.2f.\n", cartTotal);
+		}
 	}
 	
 	//tests to see if a String next is a member of stringArray
 	public static boolean isMember(String [] stringArray, String next){
 		for(int i = 0; i < stringArray.length; i++){
-			if (stringArray[i].equals(next)){
+			if (stringArray[i].equals(next.toLowerCase())){
 				return true;
 			}
 		}
@@ -259,18 +333,18 @@ public class A3Driver {
 		// into separate words that will be parsed
 		String[] tokens = tran.split(" +");
 		if(!isMember(operations, tokens[0])){
-			return;
+			return;	
 		}
 		if(tokens[0].equals("insert")){
-			
+			doInsert(tokens, line, shoppingCart);
 		}else if(tokens[0].equals("search")){
-			
+			doSearch(tokens, line, shoppingCart);
 		}else if(tokens[0].equals("delete")){
-			
+			doDelete(tokens, line, shoppingCart);
 		}else if(tokens[0].equals("update")){
-			
+			doUpdate(tokens, line, shoppingCart);
 		}else if(tokens[0].equals("print")){
-			
+			doPrint(tokens, line, shoppingCart);
 		}
 		
 	}
@@ -284,6 +358,7 @@ public class A3Driver {
 		//file is put in bad input for a transaction
 		int whatLine = 1;
 		// Open file; file name specified in args (command line)
+		//args[0] = "shoppingCart.txt";
 		try{
 			FileReader freader = new FileReader(args[0]);
 			BufferedReader reader = new BufferedReader(freader);
@@ -310,7 +385,7 @@ public class A3Driver {
 
 		// General code example for how to iterate an array list. You will have
 		// to modify this heavily, to suit your needs.
-		Iterator<Item> i = shoppingCart.iterator();
+		/*Iterator<Item> i = shoppingCart.iterator();
 		while (i.hasNext()) {
 			Item temp = i.next();
 			temp.calculatePrice();
@@ -321,7 +396,9 @@ public class A3Driver {
 			// invoked. Eg: If it is an instance
 			// of Grocery, it will invoke the calculatePrice () method defined
 			// in Grocery.
+		
 		}
+		*/
 	}
 
 }

@@ -19,7 +19,7 @@ public class Clothing extends Item
 	
 	void printItemAttributes () 
 	{
-		System.out.printf("%s %f %d %f\nFinal Price: $%.2d", name, price, quantity, weight, calculatePrice() );
+		System.out.printf("%s %.2f %d %d\nFinal Price for item(s): $%.2f\n", name, price, quantity, weight, calculatePrice() );
 	}
 	
 }

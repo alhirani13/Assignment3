@@ -3,9 +3,9 @@ package Assignment3;
 public class Grocery extends Item {
 
 	//variables, constructor here
-	protected boolean perishable;
+	protected String perishable;
 	
-	public Grocery(String initName, float initPrice, int initQuantity, int initWeight, boolean perish){
+	public Grocery(String initName, float initPrice, int initQuantity, int initWeight, String perish){
 		super(initName, initPrice, initQuantity, initWeight);
 		perishable = perish;
 	}
@@ -17,7 +17,7 @@ public class Grocery extends Item {
 		float final_price = 0;
 		final_price = (float)(price * quantity); // price * number of items
 		final_price += final_price*(.10); // add tax
-		if(perishable)
+		if(perishable.equals("P"))
 		{
 			float ship = (float)(20* weight)*quantity; // add shipping
 			ship += ship*.20;
@@ -32,13 +32,13 @@ public class Grocery extends Item {
 	
 	void printItemAttributes () 
 	{
-		if(perishable)
+		if(perishable.equals("P"))
 		{
-			System.out.printf("%s %f %d %f P\nFinal Price: $%.2d", name, price, quantity, weight, calculatePrice() );
+			System.out.printf("%s %.2f %d %d P\nFinal Price for item(s): $%.2f\n", name, price, quantity, weight, calculatePrice() );
 		}
 		else
 		{
-			System.out.printf("%s %f %d %f NP\nFinal Price: $%.2d", name, price, quantity, weight, calculatePrice() );
+			System.out.printf("%s %.2f %d %d NP\nFinal Price: $%.2f\n", name, price, quantity, weight, calculatePrice() );
 
 		}
 	}

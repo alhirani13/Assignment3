@@ -38,11 +38,11 @@ public class Electronics extends Item
 	{
 		if(fragile.equals("F"))
 		{
-			System.out.printf("%s %f %d %f F %s\nFinal Price: $%.2d", name, price, quantity, weight, state, calculatePrice() );
+			System.out.printf("%s %.2f %d %d F %s\nFinal Price for item(s): $%.2f\n", name, price, quantity, weight, state.toUpperCase(), calculatePrice() );
 		}
 		else
 		{
-			System.out.printf("%s %f %d %f NF %s\nFinal Price: $%.2d", name, price, quantity, weight, state, calculatePrice() );
+			System.out.printf("%s %.2f %d %d NF %s\nFinal Price for item(s): $%.2f\n", name, price, quantity, weight, state.toUpperCase(), calculatePrice() );
 
 		}
 	}
