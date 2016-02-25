@@ -48,4 +48,20 @@ public class Electronics extends Item
 	}
 	//Implement calculate price/print methods as necessary
 
+	public String getFragile() {
+		return fragile;
+	}
+
+	public void setFragile(String fragile) {
+		this.fragile = fragile;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
 }

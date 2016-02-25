@@ -42,5 +42,13 @@ public class Grocery extends Item {
 
 		}
 	}
+
+	public String getPerishable() {
+		return perishable;
+	}
+
+	public void setPerishable(String perishable) {
+		this.perishable = perishable;
+	}
 	
 }
